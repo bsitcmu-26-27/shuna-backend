@@ -1,0 +1,124 @@
+<!-- test.html — open directly in a browser, no build step needed -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Freedom Wall — backend test</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    textarea, input, select { display: block; width: 100%; margin: 0.5rem 0; padding: 0.5rem; }
+    .note { border: 1px solid #ccc; border-radius: 8px; padding: 0.75rem; margin: 0.5rem 0; }
+    .note img { max-width: 100%; display: block; margin-top: 0.5rem; }
+    button { padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Post a note</h2>
+  <form id="post-form">
+    <textarea name="message" placeholder="Your thought..." required></textarea>
+    <input name="author" placeholder="Name (optional)" />
+    <select name="category">
+      <option value="random">Random Thoughts</option>
+      <option value="appreciation">Appreciation</option>
+      <option value="student-life">Student Life</option>
+      <option value="funny">Funny</option>
+      <option value="dreams">Dreams & Goals</option>
+      <option value="ideas">Ideas</option>
+      <option value="experiences">Experiences</option>
+      <option value="other">Other</option>
+    </select>
+    <select name="color">
+      <option value="yellow">Sunshine</option>
+      <option value="pink">Blush</option>
+      <option value="blue">Sky</option>
+      <option value="mint">Mint</option>
+      <option value="peach">Peach</option>
+      <option value="lilac">Lilac</option>
+    </select>
+    <input type="file" name="media" accept="image/*" />
+    <button type="submit">Post</button>
+  </form>
+
+  <h2>Wall</h2>
+  <button id="refresh">Refresh</button>
+  <div id="notes"></div>
+
+  <!-- replace the <script> block's loadNotes() with this -->
+<script>
+  const API = "http://localhost:8080";
+
+  async function loadNotes() {
+    const res = await fetch(`${API}/posts`);
+    const posts = await res.json();
+    const container = document.getElementById("notes");
+    container.innerHTML = "";
+    for (const post of posts) {
+      const div = document.createElement("div");
+      div.className = "note";
+      div.innerHTML = `
+        <strong>${post.author}</strong> — ${post.category} — <em>${post.status}</em>
+        <p>${post.message}</p>
+        ${post.media ? `<img src="${API}${post.media.dataUrl}" />` : ""}
+        <div>❤️ ${post.reactions}</div>
+        <div>
+          <label>x <input type="number" class="x" value="${post.x}" style="width:80px" /></label>
+          <label>y <input type="number" class="y" value="${post.y}" style="width:80px" /></label>
+          <button class="save-pos" data-id="${post.id}">Save position</button>
+        </div>
+        <div>
+          <button class="mod" data-id="${post.id}" data-status="approved">Approve</button>
+          <button class="mod" data-id="${post.id}" data-status="pending">Pending</button>
+          <button class="mod" data-id="${post.id}" data-status="rejected">Reject</button>
+          <button class="delete" data-id="${post.id}">Delete</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    container.querySelectorAll(".mod").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        await fetch(`${API}/posts/${btn.dataset.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: btn.dataset.status }),
+        });
+        loadNotes();
+      });
+    });
+
+    container.querySelectorAll(".save-pos").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const note = e.target.closest(".note");
+        const x = note.querySelector(".x").value;
+        const y = note.querySelector(".y").value;
+        await fetch(`${API}/posts/${btn.dataset.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ x, y }),
+        });
+        loadNotes();
+      });
+    });
+
+    container.querySelectorAll(".delete").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        if (!confirm("Delete this note?")) return;
+        await fetch(`${API}/posts/${btn.dataset.id}`, { method: "DELETE" });
+        loadNotes();
+      });
+    });
+  }
+
+  document.getElementById("post-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    await fetch(`${API}/posts`, { method: "POST", body: form });
+    e.target.reset();
+    loadNotes();
+  });
+
+  document.getElementById("refresh").addEventListener("click", loadNotes);
+  loadNotes();
+</script> 
+</body>
+</html>
