@@ -13,5 +13,5 @@ RUN git config --global --add safe.directory /home/cmu-bsit && \
 
 USER cmu-bsit
 RUN pip3 install -r requirements.txt --break-system-packages
-
+EXPOSE 8080
 CMD ["python3", "main.py"]
