@@ -18,6 +18,7 @@ app = Bottle()
 
 DB_URL = os.environ["DATABASE_URL"]  # Koyeb gives you this connection string
 ADMIN_API_KEY = os.environ["ADMIN_API_KEY"]
+print(os.environ["DATABASE_URL"])
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
