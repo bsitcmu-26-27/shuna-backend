@@ -8,6 +8,7 @@ from functools import wraps
 import psycopg2
 import psycopg2.extras
 from bottle import Bottle, request, response, static_file, run
+import image_compress
 
 import time
 from collections import defaultdict, deque
@@ -242,6 +243,37 @@ def delete_post(post_id):
         return {"error": "Post not found."}
     response.status = 204
     return ""
+@app.route("/posts/<post_id>/position", method="OPTIONS")
+def cors_preflight_position(post_id=None):
+    return {}
+
+
+@app.route("/posts/<post_id>/position", method="PATCH")
+@rate_limited(max_requests=30, window=60)
+def update_note_position(post_id):
+    data = request.json or {}
+    if "x" not in data or "y" not in data:
+        response.status = 400
+        return {"error": "Both x and y are required."}
+
+    try:
+        x, y = float(data["x"]), float(data["y"])
+    except (TypeError, ValueError):
+        response.status = 400
+        return {"error": "x and y must be numbers."}
+
+    conn = get_conn()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("UPDATE posts SET x = %s, y = %s WHERE id = %s RETURNING *", (x, y, post_id))
+    row = cur.fetchone()
+    conn.commit()
+    conn.close()
+
+    if not row:
+        response.status = 404
+        return {"error": "Post not found."}
+    response.content_type = "application/json"
+    return json.dumps(row_to_post(row))
 
 @app.route("/")
 def root():
