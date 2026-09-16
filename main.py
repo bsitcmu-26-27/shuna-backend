@@ -16,7 +16,7 @@ def upload_form():
 
 @route('/')
 def root():
-	return static_file("index.html", root="./")
+	return "Hello World!"
 
 @route('/upload', method='POST')
 def do_upload():
