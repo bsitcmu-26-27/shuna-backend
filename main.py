@@ -9,6 +9,7 @@ import psycopg2
 import psycopg2.extras
 from bottle import Bottle, request, response, static_file, run
 import image_compress
+from passcode import require_booth_passcode
 
 import time
 from collections import defaultdict, deque
@@ -18,6 +19,7 @@ app = Bottle()
 
 DB_URL = os.environ["DATABASE_URL"]  # Koyeb gives you this connection string
 ADMIN_API_KEY = os.environ["ADMIN_API_KEY"]
+BOOTH_PASSCODE = os.environ["BOOTH_PASSCODE"]
 print(os.environ["DATABASE_URL"])
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -128,6 +130,7 @@ def list_posts():
 
 
 @app.route("/posts", method="POST")
+@require_booth_passcode
 def create_post():
     message = (request.forms.get("message") or "").strip()
     author = (request.forms.get("author") or "").strip() or "Anonymous yarn?"
