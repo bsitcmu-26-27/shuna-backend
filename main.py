@@ -249,7 +249,7 @@ def cors_preflight_position(post_id=None):
 
 
 @app.route("/posts/<post_id>/position", method="PATCH")
-@rate_limited(max_requests=30, window=60)
+#@rate_limited(max_requests=30, window=60)
 def update_note_position(post_id):
     data = request.json or {}
     if "x" not in data or "y" not in data:
