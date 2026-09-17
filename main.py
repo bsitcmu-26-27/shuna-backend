@@ -9,7 +9,7 @@ import psycopg2
 import psycopg2.extras
 from bottle import Bottle, request, response, static_file, run
 import image_compress
-from passcode import require_booth_passcode
+#from passcode import require_booth_passcode
 
 import time
 from collections import defaultdict, deque
@@ -26,6 +26,17 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 MAX_MESSAGE_LEN = 500
+
+def require_booth_passcode(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        passcode = request.forms.get("passcode") or ""
+        print(passcode, BOOTH_PASSCODE)
+        if not hmac.compare_digest(passcode, BOOTH_PASSCODE):
+            response.status = 403
+            return {"error": "Incorrect booth passcode."}
+        return fn(*args, **kwargs)
+    return wrapper
 
 
 request_log = defaultdict(deque)

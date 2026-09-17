@@ -1,6 +1,8 @@
 from functools import wraps
 from bottle import request
 import hmac
+import os
+BOOTH_PASSCODE = os.environ["BOOTH_PASSCODE"]
 
 def require_booth_passcode(fn):
     @wraps(fn)
