@@ -36,6 +36,7 @@
       <option value="lilac">Lilac</option>
     </select>
     <input type="file" name="media" accept="image/*" />
+    <input type="password" name="passcode" placeholder="Booth passcode" required />
     <button type="submit">Post</button>
   </form>
 
@@ -45,7 +46,7 @@
 
   <!-- replace the <script> block's loadNotes() with this -->
 <script>
-  const API = "https://experienced-anthe-nisheri-ascar-2970fad8.koyeb.app/";
+  const API = "https://experienced-anthe-nisheri-ascar-2970fad8.koyeb.app";
 
   async function loadNotes() {
     const res = await fetch(`${API}/posts`);
