@@ -45,7 +45,7 @@ request_log = defaultdict(deque)
 def health_check():
     return {
         "database_connected": _check_db(),
-        "database_url_length": len(os.environ.get("DATABSE_URL"))
+        "database_url_length": len(os.environ.get("DATABASE_URL")),
         "booth_passcode_set": bool(os.environ.get("BOOTH_PASSCODE")),
         "booth_passcode_length": len(os.environ.get("BOOTH_PASSCODE", "")),
         "admin_key_set": bool(os.environ.get("ADMIN_API_KEY")),
