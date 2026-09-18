@@ -2,25 +2,32 @@
 import os
 import uuid
 import json
-
 import hmac
 from functools import wraps
 import psycopg2
 import psycopg2.extras
-from bottle import Bottle, request, response, static_file, run
-import image_compress
+from app import app
+from storage import upload_image, image_url, file_serve
+from image_compress import compress_image
+import config
+from bottle import run, static_file, request, response, redirect
 #from passcode import require_booth_passcode
+
+#
+# routes
+import routes
+
+#
 
 import time
 from collections import defaultdict, deque
 
 
-app = Bottle()
+config.check()
+DB_URL = config.DB_URL
+ADMIN_API_KEY = config.ADMIN_API_KEY
+BOOTH_PASSCODE = config.BOOTH_PASSCODE
 
-DB_URL = os.environ["DATABASE_URL"]  # Koyeb gives you this connection string
-ADMIN_API_KEY = os.environ["ADMIN_API_KEY"]
-BOOTH_PASSCODE = os.environ["BOOTH_PASSCODE"]
-print(os.environ["DATABASE_URL"])
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -126,7 +133,7 @@ def row_to_post(row):
         "status": row["status"],
         "isSeed": False,
         "media": (
-            {"type": "image", "dataUrl": f"/uploads/{row['media_path']}", "name": row["media_name"]}
+            {"type": "image", "dataUrl": image_url(row["media_path"]), "name": "photo"}
             if row["media_path"] else None
         ),
         "x": row["x"],
@@ -182,10 +189,8 @@ def create_post():
         if upload.content_type not in ALLOWED_IMAGE_TYPES:
             response.status = 400
             return {"error": "Only image uploads are allowed."}
-        ext = os.path.splitext(upload.filename)[1]
-        media_path = f"{uuid.uuid4()}{ext}"
-        upload.save(os.path.join(UPLOAD_DIR, media_path))
-        media_name = upload.filename
+        compress_bytes, content_type = compress_image(upload.file.read())
+        media_path = upload_image(compress_bytes, content_type)
 
     conn = get_conn()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -216,11 +221,13 @@ def react_to_post(post_id):
     response.content_type = "application/json"
     return json.dumps(row_to_post(row))
 
-
+"""
 @app.route("/uploads/<filename>")
 def serve_upload(filename):
-    return static_file(filename, root=UPLOAD_DIR)
-
+    #return static_file(filename, root=UPLOAD_DIR)
+    
+    redirect(file_serve(filename))
+"""
 @app.route("/posts/<post_id>", method="OPTIONS")
 def cors_preflight_post(post_id=None):
     return {}
@@ -310,7 +317,7 @@ def update_note_position(post_id):
 
 @app.route("/")
 def root():
-    return static_file("index.html", root=".")
+    return "hello! this is a backend for CMU booth... Nothing to see here i swear! >_<"
 
 if __name__ == "__main__":
     init_db()
