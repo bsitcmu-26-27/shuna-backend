@@ -33,18 +33,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 MAX_MESSAGE_LEN = 500
-"""
-def require_booth_passcode(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        passcode = request.forms.get("passcode") or ""
-        print(passcode, BOOTH_PASSCODE)
-        if not hmac.compare_digest(passcode, BOOTH_PASSCODE):
-            response.status = 403
-            return {"error": "Incorrect booth passcode."}
-        return fn(*args, **kwargs)
-    return wrapper
-"""
 
 request_log = defaultdict(deque)
 
@@ -166,7 +154,6 @@ def list_posts():
 
 
 @app.route("/posts", method="POST")
-#@require_booth_passcode
 def create_post():
     message = (request.forms.get("message") or "").strip()
     author = (request.forms.get("author") or "").strip() or "Anonymous yarn?"
@@ -221,13 +208,6 @@ def react_to_post(post_id):
     response.content_type = "application/json"
     return json.dumps(row_to_post(row))
 
-"""
-@app.route("/uploads/<filename>")
-def serve_upload(filename):
-    #return static_file(filename, root=UPLOAD_DIR)
-    
-    redirect(file_serve(filename))
-"""
 @app.route("/posts/<post_id>", method="OPTIONS")
 def cors_preflight_post(post_id=None):
     return {}
@@ -283,13 +263,13 @@ def delete_post(post_id):
         return {"error": "Post not found."}
     response.status = 204
     return ""
+
 @app.route("/posts/<post_id>/position", method="OPTIONS")
 def cors_preflight_position(post_id=None):
     return {}
 
 
 @app.route("/posts/<post_id>/position", method="PATCH")
-#@rate_limited(max_requests=30, window=60)
 def update_note_position(post_id):
     data = request.json or {}
     if "x" not in data or "y" not in data:
