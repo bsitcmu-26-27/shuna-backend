@@ -1,6 +1,7 @@
 import requests
 import config
 from bottle import response, request
+from functools import wraps
 
 def require_captcha(fn):
     @wraps(fn)
