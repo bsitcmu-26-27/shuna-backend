@@ -6,10 +6,10 @@ for CMU BSIT 26-27 Website booth backend
 
 ## Cloudflare Turnstile (replaces booth passcode — open posting, bot-filtered)
 - [x] Sign up for Cloudflare Turnstile, create a widget, get Site Key + Secret Key
-- [ ] Backend: add `requests` to `requirements.txt`
-- [ ] Backend: add `require_captcha` decorator (calls Turnstile's `siteverify` endpoint)
-- [ ] Backend: apply `@require_captcha` to `POST /posts` (replacing the passcode check)
-- [ ] Backend: add `TURNSTILE_SECRET_KEY` to `config.py` and as a Koyeb env var
+- [x] Backend: add `requests` to `requirements.txt`
+- [x] Backend: add `require_captcha` decorator (calls Turnstile's `siteverify` endpoint)
+- [x] Backend: apply `@require_captcha` to `POST /posts` (replacing the passcode check)
+- [x] Backend: add `TURNSTILE_SECRET_KEY` to `config.py` and as a Koyeb env var
 - [ ] Front-end (`index.html`): load `https://challenges.cloudflare.com/turnstile/v0/api.js`
 - [ ] `post-composer.tsx`: swap passcode state/input for a rendered Turnstile widget + `captchaToken` state
 - [ ] `post-composer.tsx`: reset the Turnstile widget after a successful post (tokens are single-use)
