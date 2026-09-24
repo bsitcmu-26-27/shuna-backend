@@ -36,7 +36,7 @@
       <option value="lilac">Lilac</option>
     </select>
     <input type="file" name="media" accept="image/*" />
-    <input type="password" name="passcode" placeholder="Booth passcode" required />
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAFBq5Kl9pidQBdYC" data-callback="onTurnstileVerify"</div>
     <button type="submit">Post</button>
   </form>
 
@@ -44,9 +44,11 @@
   <button id="refresh">Refresh</button>
   <div id="notes"></div>
 
-  <!-- replace the <script> block's loadNotes() with this -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
   const API = "API_CHANGE_TEXT";
+  let captchaToken = "";
+  function onTurnstileVerify(token) { captchaToken = token; }
 
   async function loadNotes() {
     const res = await fetch(`${API}/posts`);
@@ -112,9 +114,16 @@
 
   document.getElementById("post-form").addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (!captchaToken) { 
+	    alert("Humana sa ang captcha boi, kulatahon taka");
+	    return;
+    }
     const form = new FormData(e.target);
+    form.append("captcha_token", captchaToken);
     await fetch(`${API}/posts`, { method: "POST", body: form });
     e.target.reset();
+    captchaToken = "";
+    window.turnstile?.reset();
     loadNotes();
   });
 
