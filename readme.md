@@ -5,7 +5,7 @@ for CMU BSIT 26-27 Website booth backend
 # To-Dos
 
 ## Cloudflare Turnstile (replaces booth passcode — open posting, bot-filtered)
-- [ ] Sign up for Cloudflare Turnstile, create a widget, get Site Key + Secret Key
+- [x] Sign up for Cloudflare Turnstile, create a widget, get Site Key + Secret Key
 - [ ] Backend: add `requests` to `requirements.txt`
 - [ ] Backend: add `require_captcha` decorator (calls Turnstile's `siteverify` endpoint)
 - [ ] Backend: apply `@require_captcha` to `POST /posts` (replacing the passcode check)
