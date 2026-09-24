@@ -11,7 +11,7 @@ from storage import upload_image, image_url, file_serve
 from image_compress import compress_image
 import config
 from bottle import run, static_file, request, response, redirect
-#from passcode import require_booth_passcode
+import captcha
 
 #
 # routes
@@ -154,6 +154,7 @@ def list_posts():
 
 
 @app.route("/posts", method="POST")
+@captcha.require_captcha
 def create_post():
     message = (request.forms.get("message") or "").strip()
     author = (request.forms.get("author") or "").strip() or "Anonymous yarn?"
