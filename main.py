@@ -12,6 +12,7 @@ from image_compress import compress_image
 import config
 from bottle import run, static_file, request, response, redirect
 import captcha
+import shuna_server
 
 #
 # routes
@@ -52,32 +53,7 @@ def _check_db():
     except Exception:
         return False
 
-def rate_limited(max_requests=5, window=60):
-    def decorator(fn):
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            ip = request.environ.get("HTTP_X_FORWARDED_FOR", request.environ.get("REMOTE_ADDR"))
-            now = time.time()
-            q = request_log[ip]
-            while q and now - q[0] > window:
-                q.popleft()
-            if len(q) >= max_requests:
-                response.status = 429
-                response.headers["Retry-After"] = str(int(window - (now - q[0])))
-                return {"error": "Too many requests. Please slow down."}
-            q.append(now)
-            return fn(*args, **kwargs)
-        return wrapper
 
-def require_api_key(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        key = request.headers.get("X-API-Key", "")
-        if not hmac.compare_digest(key, ADMIN_API_KEY):
-            response.status = 401
-            return {"error": "Invalid or missing API key."}
-        return fn(*args, **kwargs)
-    return wrapper
 
 def get_conn():
     return psycopg2.connect(DB_URL)
@@ -300,4 +276,4 @@ def root():
 
 if __name__ == "__main__":
     init_db()
-    run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), server=shuna_server.ShunaServer)
