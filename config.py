@@ -29,7 +29,7 @@ else:
 def check():
     if TURNSTILE_SECRET_KEY == "1x0000000000000000000000000000000AA":
         log.warning("Using test key. Do not use in branch")
-        if PROD_MODE != None or os.environ["USER"] == "cmu-bsit":
+        if PROD_MODE != None and os.environ["USER"] == "cmu-bsit":
             log.error("Currently in production, Not continuing")
             exit(1)
     print(f"""
