@@ -2,7 +2,10 @@ import os
 import logging as log
 from sys import exit
 
-BACKEND_URL = os.environ["BACKEND_URL"]
+if os.environ["BACKEND_URL"] != "http://localhost:8000":
+    print("NOT TESTING LOCALLY!")
+else:
+    BACKEND_URL = os.environ["BACKEND_URL"]
 DB_URL = os.environ["DATABASE_URL"] 
 #ADMIN_API_KEY = os.environ["ADMIN_API_KEY"]
 #BOOTH_PASSCODE = os.environ["BOOTH_PASSCODE"]

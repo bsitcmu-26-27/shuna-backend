@@ -1,4 +1,4 @@
-<!-- test.html — open directly in a browser, no build step needed -->
+
 <!doctype html>
 <html>
 <head>
@@ -36,7 +36,7 @@
       <option value="lilac">Lilac</option>
     </select>
     <input type="file" name="media" accept="image/*" />
-    <div class="cf-turnstile" data-sitekey="3x00000000000000000000FF" data-callback="onTurnstileVerify"</div>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAFBq5Kl9pidQBdYC" data-callback="onTurnstileVerify"></div>
     <button type="submit">Post</button>
   </form>
 
@@ -114,7 +114,7 @@
 
   document.getElementById("post-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!captchaToken) { 
+    if (!captchaToken) {
 	    alert("Humana sa ang captcha boi, kulatahon taka");
 	    return;
     }
@@ -129,6 +129,6 @@
 
   document.getElementById("refresh").addEventListener("click", loadNotes);
   loadNotes();
-</script> 
+</script>
 </body>
 </html>
