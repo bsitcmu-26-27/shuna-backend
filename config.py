@@ -1,15 +1,18 @@
 import os
-import logging as log
+from log import log
 from sys import exit
 
-if os.environ["BACKEND_URL"] != "http://localhost:8000":
-    print("NOT TESTING LOCALLY!")
+
+try:
+    os.environ["BACKEND_URL"]
+except:
+    BACKEND_URL = "http://localhost:8000"
+    log.info(f"Running locally at: {BACKEND_URL}")
 else:
     BACKEND_URL = os.environ["BACKEND_URL"]
-DB_URL = os.environ["DATABASE_URL"] 
-#ADMIN_API_KEY = os.environ["ADMIN_API_KEY"]
-#BOOTH_PASSCODE = os.environ["BOOTH_PASSCODE"]
+    log.info(f"Running non-local backend at {BACKEND_URL}")
 
+DB_URL = os.environ["DATABASE_URL"]
 try:
     os.environ["TURNSTILE_SECRET_KEY"]
 except:
@@ -21,12 +24,15 @@ aws_access_key_id=os.environ["NEON_S3_ACCESS_KEY"]
 aws_secret_access_key=os.environ["NEON_S3_SECRET_KEY"]
 region_name=os.environ["NEON_S3_REGION"]
 BUCKET=os.environ["NEON_S3_BUCKET"]
+
 try:
     os.environ["PROD_MODE"]
 except:
     PROD_MODE = None
+    log.info("Running locally. PROD_MODE is not set.")
 else:
     PROD_MODE=os.environ["PROD_MODE"]
+    log.info("Running on Production Mode.")
 
 
 def check():
@@ -35,7 +41,8 @@ def check():
         if PROD_MODE != None and os.environ["USER"] == "cmu-bsit":
             log.error("Currently in production, Not continuing")
             exit(1)
-    print(f"""
+
+    log.debug(f"""
 ENVIRONMENT VARIABLES
 
 BACKEND_URL {BACKEND_URL}

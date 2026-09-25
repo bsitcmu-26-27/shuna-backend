@@ -13,6 +13,11 @@ import config
 from bottle import run, static_file, request, response, redirect
 import captcha
 import shuna_server
+from log import log
+
+log.setLevel(20) # Info
+
+log.info("Server initializing.")
 
 #
 # routes

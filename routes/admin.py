@@ -19,5 +19,6 @@ def admin_page():
 	file = open(f"{filename}-dup", "r")
 	content = file.read()
 	os.remove(f"{filename}-dup")
+	log.debug("Showing content of duplicated modified file:\n" + content)
 	return content
 
