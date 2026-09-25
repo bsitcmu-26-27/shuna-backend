@@ -25,8 +25,6 @@ from collections import defaultdict, deque
 
 config.check()
 DB_URL = config.DB_URL
-ADMIN_API_KEY = config.ADMIN_API_KEY
-BOOTH_PASSCODE = config.BOOTH_PASSCODE
 
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
