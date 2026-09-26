@@ -21,7 +21,7 @@ log.info("Server initializing.")
 
 #
 # routes
-import routes
+import routes.admin
 
 #
 
